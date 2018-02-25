@@ -1,0 +1,69 @@
+Eric Thoman
+
+Why I chose java: 
+
+To be honest, this project probably would have been much easier and intuitive had I 
+coded it in Python. I heavily considered using Python to create this program, but I realized that
+I wanted to code it in Java simply because it would be a new experience for me. 
+In my 6 or 7 years of experience with Java, I have never used the language for anything
+network or server based. I chose Java because I wanted to step outside of my comfort zone
+and learn more about a language in which I am already fluent. Everything I have coded in
+Python has revolved around fetching data from servers so I wanted to challenge myself by
+applying familiar tools to a new situation. Google's gsutil tool for Python did seem very
+useful for this assignment, though, and had I used Python I would have looked into it.
+ 
+ 
+ Performance of the program:
+ 
+ The program is very efficient and downloads and reassembles the entire mp4 file in two passes
+ of the data. The first pass downloads the data and puts it into a FileBackedOutputStream,
+ and the second pass reassembles the bytes in the correct mp4 formation and does an
+ integrity check.
+ 
+ Approach to the problem:
+ 
+ I wanted the program to run as quickly and as memory-efficiently as possible. My download manager
+ program makes sure that network request to the url is valid and checks to see if the server
+ supports byte fetch requests. If it does, it creates 16 threads that all download the
+ file at the same time starting from different points in the files byte stream (they all fetch 
+ different ranges of bytes from the server to download). When all the threads have finished
+ their section of the download, the download manager fetches all the bytes and writes
+ them to the mp4 file while simultaneously calculating the checksum. I integrated the checksum in
+ the mp4 assembly loop to avoid an extra pass in the data. Finally, if the checksum is equal
+ to the server checksum and the length of both files are equal, the program notifies
+ the user that the download has successfully completed. Otherwise, the program catches any
+ errors and deals with them by telling the user that the download failed. In addition, if
+ a chunk of data encounters an error mid-download, instead of terminating the whole program,
+ the thread re-attempts the download 3 times before throwing an error. My program was
+ completed as efficiently as I could think of while being flexible enough to deal with
+ unexpected errors or server responses.
+ 
+ Choice of libraries:
+ 
+ I chose the libraries that not only made the most intuitive sense to code but made the
+ fastest and most memory efficient program possible. I strategically chose Google's
+ FileBackedOutputStream because it doesn't allow the heap to get overrun with data,
+ and instead creates a temp file to store data when the data being buffering becomes too
+ sizeable. This was only an issue if multithreaded downloading was not enabled on the
+ download. I played around with which data structure I used and found this one to be a perfect
+ fit for both multithreaded and singlethreaded downloads. My original data structure caused
+ a heap out of memory exception when the entire file was being downloaded in a single thread.
+ 
+ Thread download analysis:
+ Threads			Download time (seconds)
+ 1				241.4
+ 2				149.8
+ 4				144.6
+ 8				135.2
+ 16				117.1
+ 32				117.9
+ 64				120.8
+ 
+ It seems like the optimal amount of threads to be downloading data at once is around 16.
+ 
+ Thank you for a great project! I learned a tremendous amount and actually really enjoyed myself
+  - I found it hard to tear myself away from this assignment to do my schoolwork. 
+  
+  Best,
+  Eric
+ 
